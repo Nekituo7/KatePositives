@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="yes.js"></script>
+  <link rel="stylesheet" href="main.css">
+  <title>Для Кати - Улыбнись!</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<!-- Навигация -->
+<div class="nav-container">
+  <div class="container">
+    <nav class="nav-menu">
+      <a href="#welcome" class="nav-link">Приветствие</a>
+      <a href="#gallery" class="nav-link">Галерея</a>
+      <a href="#positive" class="nav-link">Позитив</a>
+      <a href="#music" class="nav-link">Музыка</a>
+      <a href="#bubbleGame" class="nav-link">Игра</a>
+      <a href="#quotes" class="nav-link">Цитаты</a>
+    </nav>
+  </div>
+</div>
+
+<!-- Шапка -->
+<header>
+  <div class="floating-hearts" id="floatingHearts"></div>
+  <div class="header-content">
+    <h1 class="header-title">Для Кати!</h1>
+    <p class="header-subtitle">Сайт, который обязательно поднимет тебе настроение!</p>
+    <button class="btn" id="startBtn">Нажми для улыбки!</button>
+  </div>
+</header>
+
+<div class="container">
+  <!-- Приветственная секция -->
+  <section id="welcome">
+    <h2>Привет, Катя!</h2>
+    <p>Этот сайт создан специально для тебя, чтобы поднять твоё настроение и заставить улыбнуться!</p>
+    <p>Здесь ты найдёшь много приятных сюрпризов, красивых анимаций и интерактивных элементов.</p>
+    <div class="progress-container">
+      <div class="progress-bar" id="moodBar"></div>
+    </div>
+    <p id="moodText">Твоё настроение: Нажми кнопку выше, чтобы улучшить!</p>
+  </section>
+
+  <!-- Галерея -->
+  <section id="gallery">
+    <h2>Галерея улыбок</h2>
+    <p>Посмотри на эти красивые изображения, которые заставят тебя улыбнуться!</p>
+    <div class="gallery">
+      <div class="gallery-item">
+        <img src="flower.png" alt="Цветы" loading="lazy">
+      </div>
+      <div class="gallery-item">
+        <img src="sunser.png" alt="Закат" loading="lazy">
+      </div>
+      <div class="gallery-item">
+        <img src="cat.png" alt="Котик" loading="lazy">
+      </div>
+      <div class="gallery-item">
+        <img src="raduga.jpg" alt="Радуга" loading="lazy">
+      </div>
+      <div class="gallery-item">
+        <img src="car.png" alt="Машина" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <!-- Позитивные карточки -->
+  <section id="positive">
+    <h2>Позитивные мысли</h2>
+    <p>Иногда простое напоминание о хорошем может изменить весь день!</p>
+    <div class="positive-cards">
+      <div class="positive-card">
+        <i class="fas fa-sun"></i>
+        <h3>Каждый день - это новый шанс</h3>
+        <p>Начни день с улыбки и позитивных мыслей</p>
+      </div>
+      <div class="positive-card">
+        <i class="fas fa-star"></i>
+        <h3>Ты заслуживаешь хорошего дня</h3>
+        <p>Позволь себе насладиться моментом</p>
+      </div>
+      <div class="positive-card">
+        <i class="fas fa-heart"></i>
+        <h3>Небольшие радости важны</h3>
+        <p>Цени маленькие моменты счастья</p>
+      </div>
+      <div class="positive-card">
+        <i class="fas fa-cloud"></i>
+        <h3>Плохое настроение проходит</h3>
+        <p>Как облака на небе - оно скоро уйдёт</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Музыкальный плеер -->
+  <section id="music">
+    <h2>Музыка для настроения</h2>
+    <p>Включи приятную музыку, чтобы поднять настроение!</p>
+    <div class="music-player">
+      <h3>Радио "Улыбка"</h3>
+      <div class="player-controls">
+        <button class="player-btn" id="prevBtn"><i class="fas fa-backward"></i></button>
+        <button class="player-btn" id="playBtn"><i class="fas fa-play"></i></button>
+        <button class="player-btn" id="nextBtn"><i class="fas fa-forward"></i></button>
+      </div>
+      <p id="songTitle">Выберите трек</p>
+    </div>
+  </section>
+
+  <!-- Игра с пузырьками -->
+  <section id="bubbleGame">
+    <h2>Игра с пузырьками</h2>
+    <p>Лопай пузыри, чтобы поднять настроение!</p>
+    <div class="bubble-game">
+      <p>Счёт: <span id="score">0</span></p>
+      <button class="btn" id="startBubbleGame">Начать игру</button>
+    </div>
+  </section>
+
+  <!-- Цитаты -->
+  <section id="quotes">
+    <h2>Вдохновляющие цитаты</h2>
+    <p>Иногда немного мудрости может изменить весь день!</p>
+    <div class="quotes">
+      <div class="quote">
+        <p>"Самое большое счастье в жизни - это уверенность, что тебя любят."</p>
+        <p>- Виктор Гюго</p>
+      </div>
+      <div class="quote">
+        <p>"Улыбка - это солнце, которое прогоняет зиму с человеческого лица."</p>
+        <p>- Виктор Гюго</p>
+      </div>
+      <div class="quote">
+        <p>"Счастье - это не что-то готовое. Оно приходит из ваших собственных действий."</p>
+        <p>- Далай-лама</p>
+      </div>
+    </div>
+    <button class="btn" id="newQuoteBtn">Новая цитата</button>
+  </section>
+
+  <!-- Секретный раздел -->
+  <section class="secret-section" id="secretSection">
+    <h2>Секретный раздел!</h2>
+    <p>Поздравляю, ты нашла секретный раздел! Надеюсь, тебе весело!</p>
+    <div class="animated-element">
+      <i class="fas fa-gift rotating-element" style="font-size: 4rem; color: #ff6b6b;"></i>
+    </div>
+    <p>Желаю тебе отличного дня!</p>
+  </section>
+</div>
+
+<!-- Подвал -->
+<footer>
+  <h3>Сделано для Кати с дущой</h3>
+  <p>Надеюсь, этот сайт поднял тебе настроение!</p>
+  <div class="social-links">
+    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+    <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+    <a href="#" class="social-link"><i class="fab fa-tiktok"></i></a>
+  </div>
+</footer>
+
+<!-- Модальное окно -->
+<div class="modal" id="surpriseModal">
+  <div class="modal-content">
+    <span class="close-modal" id="closeModal">&times;</span>
+    <h2>Сюрприз!</h2>
+    <p>Ты достигла максимального уровня настроения!</p>
+    <p>Пусть каждый твой день будет наполнен радостью, улыбками и счастьем!</p>
+    <div class="animated-element">
+      <i class="fas fa-heart" style="font-size: 2.5rem; color: #ff6b6b;"></i>
+    </div>
+    <button class="btn" id="closeSurpriseBtn">Спасибо!</button>
+  </div>
+</div>
+</body>
+</html>
