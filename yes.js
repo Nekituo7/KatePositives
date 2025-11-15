@@ -67,6 +67,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.addEventListener('touchmove', function(e) {
         if (e.touches.length > 1) e.preventDefault();
     }, { passive: false });
+
+    initClicker();
 });
 
 // Создание плавающих сердечек
@@ -346,4 +348,190 @@ function animateOnScroll() {
         element.style.opacity = '0';
         observer.observe(element);
     });
+}
+
+// Кликер игра
+let happinessPoints = 0;
+let clickPower = 1;
+let autoClickers = 0;
+let clickCount = 0;
+let autoClickInterval;
+
+// Инициализация кликера после загрузки DOM
+function initClicker() {
+    console.log('Инициализация кликера...');
+
+    const clickerHeart = document.getElementById('clickerHeart');
+    const upgradeClick = document.getElementById('upgradeClick');
+    const upgradeAutoClick = document.getElementById('upgradeAutoClick');
+    const upgradeMegaClick = document.getElementById('upgradeMegaClick');
+
+    if (!clickerHeart) {
+        console.error('Элемент clickerHeart не найден!');
+        return;
+    }
+
+    clickerHeart.addEventListener('click', handleClick);
+    upgradeClick.addEventListener('click', upgradeClickHandler);
+    upgradeAutoClick.addEventListener('click', buyAutoClicker);
+    upgradeMegaClick.addEventListener('click', buyMegaClick);
+
+    // Обновляем отображение улучшений
+    updateUpgrades();
+    updateClickerDisplay();
+
+    console.log('Кликер инициализирован успешно!');
+}
+
+// Обработчик клика
+function handleClick(event) {
+    happinessPoints += clickPower;
+    clickCount++;
+
+    // Анимация сердечка
+    const heart = event.currentTarget;
+    heart.style.transform = 'scale(0.9)';
+    setTimeout(() => {
+        heart.style.transform = 'scale(1)';
+    }, 100);
+
+    // Создание летающего числа
+    createFloatingNumber(clickPower, event.clientX, event.clientY);
+
+    updateClickerDisplay();
+}
+
+// Создание летающего числа
+function createFloatingNumber(value, x, y) {
+    const number = document.createElement('div');
+    number.textContent = '+' + value;
+    number.style.position = 'fixed';
+    number.style.left = x + 'px';
+    number.style.top = y + 'px';
+    number.style.color = '#ff6b6b';
+    number.style.fontWeight = 'bold';
+    number.style.fontSize = '1.5rem';
+    number.style.pointerEvents = 'none';
+    number.style.zIndex = '1000';
+    number.style.animation = 'floatNumber 1s ease-out forwards';
+
+    document.body.appendChild(number);
+
+    setTimeout(() => {
+        if (number.parentNode) {
+            number.remove();
+        }
+    }, 1000);
+}
+
+// Обновление отображения
+function updateClickerDisplay() {
+    const happinessPointsEl = document.getElementById('happinessPoints');
+    const clickPowerEl = document.getElementById('clickPower');
+    const autoClickersEl = document.getElementById('autoClickers');
+    const clickCountEl = document.getElementById('clickCount');
+
+    if (happinessPointsEl) happinessPointsEl.textContent = happinessPoints;
+    if (clickPowerEl) clickPowerEl.textContent = clickPower;
+    if (autoClickersEl) autoClickersEl.textContent = autoClickers;
+    if (clickCountEl) clickCountEl.textContent = clickCount;
+
+    updateUpgrades();
+}
+
+// Обновление кнопок улучшений
+function updateUpgrades() {
+    const upgradeClick = document.getElementById('upgradeClick');
+    const upgradeAutoClick = document.getElementById('upgradeAutoClick');
+    const upgradeMegaClick = document.getElementById('upgradeMegaClick');
+
+    if (upgradeClick) {
+        upgradeClick.disabled = happinessPoints < 10;
+        upgradeClick.textContent = `Улучшить клик (+1) - 10 очков`;
+    }
+
+    if (upgradeAutoClick) {
+        upgradeAutoClick.disabled = happinessPoints < 50;
+        upgradeAutoClick.textContent = `Купить авто-кликер - 50 очков`;
+    }
+
+    if (upgradeMegaClick) {
+        upgradeMegaClick.disabled = happinessPoints < 100;
+        upgradeMegaClick.textContent = `Мега-клик (x2) - 100 очков`;
+    }
+}
+
+// Улучшение клика
+function upgradeClickHandler() {
+    if (happinessPoints >= 10) {
+        happinessPoints -= 10;
+        clickPower += 1;
+        showNotification('Сила клика увеличена!');
+        updateClickerDisplay();
+    }
+}
+
+// Покупка авто-кликера
+function buyAutoClicker() {
+    if (happinessPoints >= 50) {
+        happinessPoints -= 50;
+        autoClickers += 1;
+
+        // Останавливаем предыдущий интервал если есть
+        if (autoClickInterval) {
+            clearInterval(autoClickInterval);
+        }
+
+        // Запускаем авто-клики
+        autoClickInterval = setInterval(() => {
+            happinessPoints += autoClickers;
+            updateClickerDisplay();
+        }, 1000);
+
+        showNotification('Авто-кликер куплен!');
+        updateClickerDisplay();
+    }
+}
+
+// Покупка мега-клика
+function buyMegaClick() {
+    if (happinessPoints >= 100) {
+        happinessPoints -= 100;
+        clickPower *= 2;
+        showNotification('Мега-клик активирован! Сила клика удвоена!');
+        updateClickerDisplay();
+    }
+}
+
+// Показать уведомление
+function showNotification(message) {
+    // Удаляем предыдущие уведомления
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    });
+
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.background = '#4CAF50';
+    notification.style.color = 'white';
+    notification.style.padding = '15px 20px';
+    notification.style.borderRadius = '10px';
+    notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    notification.style.zIndex = '1000';
+    notification.style.animation = 'slideInRight 0.5s ease';
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 3000);
 }

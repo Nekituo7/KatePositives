@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="main.css">
+    <title>Змейка - Для Кати</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .snake-game-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        #snakeCanvas {
+            border: 3px solid var(--primary-color);
+            border-radius: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .game-stats {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 15px;
+            margin: 20px auto;
+            max-width: 400px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .game-stats p {
+            margin: 10px 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .game-controls {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .mobile-controls {
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 200px;
+            margin: 20px auto;
+        }
+
+        .mobile-controls button {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .mobile-controls button:active {
+            transform: scale(0.9);
+            background: var(--secondary-color);
+        }
+
+        .control-up { grid-column: 2; grid-row: 1; }
+        .control-left { grid-column: 1; grid-row: 2; }
+        .control-right { grid-column: 3; grid-row: 2; }
+        .control-down { grid-column: 2; grid-row: 3; }
+
+        @media (max-width: 768px) {
+            #snakeCanvas {
+                width: 95vw;
+                height: 95vw;
+                max-width: 400px;
+                max-height: 400px;
+            }
+            .mobile-controls {
+                display: grid;
+            }
+            .game-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            .control-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        .game-over {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-over-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .game-instructions {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px auto;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .instructions-list {
+            text-align: left;
+            margin: 15px 0;
+        }
+
+        .instructions-list li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+<!-- Навигация -->
+<div class="nav-container">
+    <div class="container">
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-link">Главная</a>
+            <a href="#game" class="nav-link">Змейка</a>
+        </nav>
+    </div>
+</div>
+
+<!-- Шапка -->
+<header>
+    <div class="floating-hearts" id="floatingHearts"></div>
+    <div class="header-content">
+        <h1 class="header-title">Змейка!</h1>
+        <p class="header-subtitle">Классическая игра для поднятия настроения!</p>
+    </div>
+</header>
+
+<div class="container">
+    <section id="game">
+        <h2>Игра "Змейка"</h2>
+        <p>Собери как можно больше сердечек, управляя змейкой с помощью стрелок!</p>
+
+        <div class="game-instructions">
+            <h3>Как играть:</h3>
+            <div class="instructions-list">
+                <li>🔄 Используй стрелки на клавиатуре для управления</li>
+                <li>❤️ Собирай красные сердечки для увеличения счета</li>
+                <li>🚫 Не врезайся в стены и в себя</li>
+                <li>⏸️ Пробел - пауза/продолжить</li>
+            </div>
+        </div>
+
+        <div class="game-stats">
+            <p>Счет: <span id="score">0</span></p>
+            <p>Рекорд: <span id="highScore">0</span></p>
+            <p>Длина: <span id="snakeLength">1</span></p>
+        </div>
+
+        <div class="game-controls">
+            <button class="btn" id="startBtn">Начать игру</button>
+            <button class="btn" id="pauseBtn">Пауза</button>
+            <button class="btn" id="restartBtn">Перезапуск</button>
+        </div>
+
+        <div class="snake-game-container">
+            <canvas id="snakeCanvas" width="400" height="400"></canvas>
+
+            <div class="mobile-controls">
+                <button class="control-up" id="upBtn">↑</button>
+                <button class="control-left" id="leftBtn">←</button>
+                <button class="control-right" id="rightBtn">→</button>
+                <button class="control-down" id="downBtn">↓</button>
+            </div>
+        </div>
+
+        <div class="control-buttons">
+            <button class="btn" id="instructionsBtn">
+                <i class="fas fa-info-circle"></i> Инструкция
+            </button>
+            <button class="btn" id="speedUpBtn">
+                <i class="fas fa-bolt"></i> Ускорить
+            </button>
+            <button class="btn" id="speedDownBtn">
+                <i class="fas fa-tachometer-alt"></i> Замедлить
+            </button>
+        </div>
+    </section>
+</div>
+
+<!-- Подвал -->
+<footer>
+    <h3>Сделано для Кати с душой</h3>
+    <p>Надеюсь, эта игра поднимет тебе настроение!</p>
+</footer>
+
+<!-- Модальное окно игры -->
+<div class="game-over" id="gameOver">
+    <div class="game-over-content">
+        <h2>Игра окончена!</h2>
+        <div class="final-stats">
+            <p>Твой счет: <span id="finalScore">0</span></p>
+            <p>Рекорд: <span id="finalHighScore">0</span></p>
+            <p>Длина змейки: <span id="finalLength">0</span></p>
+        </div>
+        <div class="game-over-buttons">
+            <button class="btn" id="playAgainBtn">Играть снова</button>
+            <button class="btn" id="mainMenuBtn">Главное меню</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Код для змейки
+    const canvas = document.getElementById('snakeCanvas');
+    const ctx = canvas.getContext('2d');
+    const gridSize = 20;
+    const tileCount = canvas.width / gridSize;
+
+    let snake = [];
+    let food = {};
+    let score = 0;
+    let highScore = localStorage.getItem('snakeHighScore') || 0;
+    let dx = 0;
+    let dy = 0;
+    let gameSpeed = 150;
+    let gameInterval;
+    let isPaused = false;
+    let isGameOver = false;
+    let gameStarted = false;
+
+    // Инициализация игры
+    function initGame() {
+        snake = [{x: 10, y: 10}];
+        food = generateFood();
+        score = 0;
+        dx = 0;
+        dy = 0;
+        isGameOver = false;
+        gameStarted = true;
+        gameSpeed = 150;
+
+        document.getElementById('score').textContent = score;
+        document.getElementById('highScore').textContent = highScore;
+        document.getElementById('snakeLength').textContent = snake.length;
+        document.getElementById('gameOver').style.display = 'none';
+        document.getElementById('pauseBtn').textContent = 'Пауза';
+
+        if (gameInterval) clearInterval(gameInterval);
+        gameInterval = setInterval(gameLoop, gameSpeed);
+
+        // Отрисовка начального состояния
+        draw();
+    }
+
+    // Генерация еды
+    function generateFood() {
+        let newFood;
+        let onSnake;
+        let attempts = 0;
+
+        do {
+            onSnake = false;
+            newFood = {
+                x: Math.floor(Math.random() * tileCount),
+                y: Math.floor(Math.random() * tileCount)
+            };
+
+            // Проверяем, не на змейке ли еда
+            for (let segment of snake) {
+                if (segment.x === newFood.x && segment.y === newFood.y) {
+                    onSnake = true;
+                    break;
+                }
+            }
+            attempts++;
+        } while (onSnake && attempts < 100);
+
+        return newFood;
+    }
+
+    // Игровой цикл
+    function gameLoop() {
+        if (isPaused || isGameOver) return;
+
+        update();
+        draw();
+    }
+
+    // Обновление игры
+    function update() {
+        // Если змейка не двигается, не обновляем
+        if (dx === 0 && dy === 0) return;
+
+        // Перемещение змейки
+        const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+
+        // Проверка столкновения со стенами
+        if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+            gameOver();
+            return;
+        }
+
+        // Проверка столкновения с собой
+        for (let i = 0; i < snake.length; i++) {
+            if (head.x === snake[i].x && head.y === snake[i].y) {
+                gameOver();
+                return;
+            }
+        }
+
+        // Добавляем новую голову
+        snake.unshift(head);
+
+        // Проверка съедания еды
+        if (head.x === food.x && head.y === food.y) {
+            score += 10;
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('snakeHighScore', highScore);
+            }
+            food = generateFood();
+
+            // Увеличиваем скорость каждые 50 очков
+            if (score % 50 === 0 && gameSpeed > 50) {
+                gameSpeed -= 10;
+                clearInterval(gameInterval);
+                gameInterval = setInterval(gameLoop, gameSpeed);
+            }
+        } else {
+            // Удаляем хвост только если не съели еду
+            snake.pop();
+        }
+
+        updateDisplay();
+    }
+
+    // Отрисовка игры
+    function draw() {
+        // Очистка canvas
+        ctx.fillStyle = 'rgba(102, 126, 234, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Отрисовка сетки
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < tileCount; i++) {
+            for (let j = 0; j < tileCount; j++) {
+                ctx.strokeRect(i * gridSize, j * gridSize, gridSize, gridSize);
+            }
+        }
+
+        // Отрисовка змейки
+        snake.forEach((segment, index) => {
+            if (index === 0) {
+                // Голова змейки
+                ctx.fillStyle = '#4CAF50';
+                ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+
+                // Глаза
+                ctx.fillStyle = 'white';
+                ctx.fillRect(segment.x * gridSize + 4, segment.y * gridSize + 4, 4, 4);
+                ctx.fillRect(segment.x * gridSize + 12, segment.y * gridSize + 4, 4, 4);
+            } else {
+                // Тело змейки
+                const gradient = ctx.createLinearGradient(
+                    segment.x * gridSize,
+                    segment.y * gridSize,
+                    segment.x * gridSize + gridSize,
+                    segment.y * gridSize + gridSize
+                );
+                gradient.addColorStop(0, '#8BC34A');
+                gradient.addColorStop(1, '#7CB342');
+
+                ctx.fillStyle = gradient;
+                ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+            }
+        });
+
+        // Отрисовка еды (сердечко)
+        ctx.fillStyle = '#ff6b6b';
+        ctx.beginPath();
+        const centerX = food.x * gridSize + gridSize/2;
+        const centerY = food.y * gridSize + gridSize/2;
+        const radius = gridSize/2 - 2;
+
+        // Рисуем сердечко
+        ctx.moveTo(centerX, centerY);
+        ctx.bezierCurveTo(
+            centerX, centerY - radius,
+            centerX - radius, centerY,
+            centerX, centerY + radius
+        );
+        ctx.bezierCurveTo(
+            centerX + radius, centerY,
+            centerX, centerY - radius,
+            centerX, centerY
+        );
+        ctx.fill();
+
+        // Блеск на сердечке
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(centerX - 2, centerY - 2, 2, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Конец игры
+    function gameOver() {
+        isGameOver = true;
+        gameStarted = false;
+        clearInterval(gameInterval);
+
+        document.getElementById('finalScore').textContent = score;
+        document.getElementById('finalHighScore').textContent = highScore;
+        document.getElementById('finalLength').textContent = snake.length;
+        document.getElementById('gameOver').style.display = 'flex';
+    }
+
+    // Обновление дисплея
+    function updateDisplay() {
+        document.getElementById('score').textContent = score;
+        document.getElementById('highScore').textContent = highScore;
+        document.getElementById('snakeLength').textContent = snake.length;
+    }
+
+    // Управление с клавиатуры
+    document.addEventListener('keydown', (e) => {
+        if (isGameOver || !gameStarted) return;
+
+        // Предотвращаем прокрутку страницы при использовании стрелок
+        if(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+            e.preventDefault();
+        }
+
+        switch(e.key) {
+            case 'ArrowUp':
+                if (dy !== 1) { dx = 0; dy = -1; }
+                break;
+            case 'ArrowDown':
+                if (dy !== -1) { dx = 0; dy = 1; }
+                break;
+            case 'ArrowLeft':
+                if (dx !== 1) { dx = -1; dy = 0; }
+                break;
+            case 'ArrowRight':
+                if (dx !== -1) { dx = 1; dy = 0; }
+                break;
+            case ' ':
+                togglePause();
+                break;
+        }
+    });
+
+    // Мобильное управление
+    document.getElementById('upBtn').addEventListener('click', () => {
+        if (dy !== 1 && gameStarted) { dx = 0; dy = -1; }
+    });
+    document.getElementById('downBtn').addEventListener('click', () => {
+        if (dy !== -1 && gameStarted) { dx = 0; dy = 1; }
+    });
+    document.getElementById('leftBtn').addEventListener('click', () => {
+        if (dx !== 1 && gameStarted) { dx = -1; dy = 0; }
+    });
+    document.getElementById('rightBtn').addEventListener('click', () => {
+        if (dx !== -1 && gameStarted) { dx = 1; dy = 0; }
+    });
+
+    // Кнопки управления
+    document.getElementById('startBtn').addEventListener('click', () => {
+        if (!gameStarted) {
+            initGame();
+        } else if (isPaused) {
+            togglePause();
+        }
+    });
+
+    document.getElementById('pauseBtn').addEventListener('click', togglePause);
+    document.getElementById('restartBtn').addEventListener('click', initGame);
+    document.getElementById('playAgainBtn').addEventListener('click', initGame);
+    document.getElementById('mainMenuBtn').addEventListener('click', () => {
+        window.location.href = 'index.html';
+    });
+
+    document.getElementById('instructionsBtn').addEventListener('click', () => {
+        alert('Управление змейкой:\n\n⬆️ Стрелка вверх - движение вверх\n⬇️ Стрелка вниз - движение вниз\n⬅️ Стрелка влево - движение влево\n➡️ Стрелка вправо - движение вправо\n⏸️ Пробел - пауза/продолжить\n\nСобери как можно больше сердечек!');
+    });
+
+    document.getElementById('speedUpBtn').addEventListener('click', () => {
+        if (gameSpeed > 50) {
+            gameSpeed -= 20;
+            if (gameInterval) {
+                clearInterval(gameInterval);
+                gameInterval = setInterval(gameLoop, gameSpeed);
+            }
+            showNotification('Скорость увеличена!');
+        }
+    });
+
+    document.getElementById('speedDownBtn').addEventListener('click', () => {
+        if (gameSpeed < 300) {
+            gameSpeed += 20;
+            if (gameInterval) {
+                clearInterval(gameInterval);
+                gameInterval = setInterval(gameLoop, gameSpeed);
+            }
+            showNotification('Скорость уменьшена!');
+        }
+    });
+
+    function togglePause() {
+        if (!gameStarted) return;
+
+        isPaused = !isPaused;
+        document.getElementById('pauseBtn').textContent = isPaused ? 'Продолжить' : 'Пауза';
+
+        if (isPaused) {
+            showNotification('Игра на паузе');
+        }
+    }
+
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            z-index: 1000;
+            animation: slideInRight 0.5s ease;
+        `;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 2000);
+    }
+
+    // Инициализация при загрузке
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('highScore').textContent = highScore;
+        draw(); // Начальная отрисовка
+
+        // Добавляем стили для анимации
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    });
+</script>
+</body>
+</html>
